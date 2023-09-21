@@ -1,0 +1,30 @@
+#!/usr/bin/with-contenv bash
+
+umask "${UMASK}"
+
+echo "
+----------------------------------------------------------------------
+ENVIRONMENT
+----------------------------------------------------------------------
+PUID=${PUID}
+PGID=${PGID}
+UMASK=${UMASK}
+----------------------------------------------------------------------
+"
+
+if [[ ! "${PUID}" -eq 0 ]] && [[ ! "${PGID}" -eq 0 ]]; then
+  echo "Executing usermod..."
+  mkdir "/tmp/temphome"
+  usermod -d "/tmp/temphome" pilot
+  usermod -o -u "${PUID}" pilot
+  usermod -d "/usr/src/app" pilot
+  rm -rf "/tmp/temphome"
+  groupmod -o -g "${PGID}" pilot
+else
+  echo "Running as root is not supported, please fix your PUID and PGID!"
+  exit 1
+fi
+
+echo "Applying permissions to /usr/src/app"
+chmod "=rwx" "/usr/src/app"
+chown -R "${PUID}":"${PGID}" "/usr/src/app"
