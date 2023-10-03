@@ -4,8 +4,8 @@ import re
 import sys
 import uuid
 from getpass import getuser
-from termcolor import colored
 from database.database import get_app, get_app_by_user_workspace
+from utils.style import green_bold
 
 
 def get_arguments():
@@ -42,20 +42,21 @@ def get_arguments():
 
             arguments['app_type'] = app.app_type
             arguments['name'] = app.name
+            arguments['step'] = app.status
             # Add any other fields from the App model you wish to include
 
-            print(colored('\n------------------ LOADING PROJECT ----------------------', 'green', attrs=['bold']))
-            print(colored(f'{app.name} (app_id={arguments["app_id"]})', 'green', attrs=['bold']))
-            print(colored('--------------------------------------------------------------\n', 'green', attrs=['bold']))
+            print(green_bold('\n------------------ LOADING PROJECT ----------------------'))
+            print(green_bold(f'{app.name} (app_id={arguments["app_id"]})'))
+            print(green_bold('--------------------------------------------------------------\n'))
         except ValueError as e:
             print(e)
             # Handle the error as needed, possibly exiting the script
     else:
         arguments['app_id'] = str(uuid.uuid4())
-        print(colored('\n------------------ STARTING NEW PROJECT ----------------------', 'green', attrs=['bold']))
+        print(green_bold('\n------------------ STARTING NEW PROJECT ----------------------'))
         print("If you wish to continue with this project in future run:")
-        print(colored(f'python {sys.argv[0]} app_id={arguments["app_id"]}', 'green', attrs=['bold']))
-        print(colored('--------------------------------------------------------------\n', 'green', attrs=['bold']))
+        print(green_bold(f'python {sys.argv[0]} app_id={arguments["app_id"]}'))
+        print(green_bold('--------------------------------------------------------------\n'))
 
     if 'email' not in arguments:
         arguments['email'] = get_email()
@@ -91,6 +92,11 @@ def get_email():
 
 # TODO can we make BaseModel.id a CharField with default=uuid4?
 def username_to_uuid(username):
+    """
+    Creates a consistent UUID from a username
+    :param username:
+    :return:
+    """
     sha1 = hashlib.sha1(username.encode()).hexdigest()
     uuid_str = "{}-{}-{}-{}-{}".format(sha1[:8], sha1[8:12], sha1[12:16], sha1[16:20], sha1[20:32])
     return str(uuid.UUID(uuid_str))

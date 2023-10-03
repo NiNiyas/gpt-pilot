@@ -37,8 +37,8 @@ RUN apk add --update --virtual=build-dependencies postgresql-dev wget gcc g++ &&
 
 CMD ["/usr/src/app/start.sh"]
 
-WORKDIR /usr/src/app/pilot
 RUN pip install -r requirements.txt
+WORKDIR /usr/src/app/pilot
 
 VOLUME ["/workspace"]
 

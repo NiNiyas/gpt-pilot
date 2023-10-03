@@ -1,8 +1,8 @@
 from prompt_toolkit.styles import Style
 import questionary
-from termcolor import colored
-
-from database.database import save_user_input, get_user_input_from_hash_id
+from utils.style import yellow_bold
+import re
+from database.database import save_user_input, get_saved_user_input
 
 custom_style = Style.from_dict({
     'question': '#FFFFFF bold',  # the color and style of the question
@@ -13,29 +13,41 @@ custom_style = Style.from_dict({
 })
 
 
+def remove_ansi_codes(s: str) -> str:
+    ansi_escape = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
+    return ansi_escape.sub('', s)
+
+
 def styled_select(*args, **kwargs):
     kwargs["style"] = custom_style  # Set style here
     return questionary.select(*args, **kwargs).unsafe_ask()  # .ask() is included here
 
 
-def styled_text(project, question):
-    project.user_inputs_count += 1
-    user_input = get_user_input_from_hash_id(project, question)
-    if user_input is not None and user_input.user_input is not None and project.skip_steps:
-        # if we do, use it
-        project.checkpoints['last_user_input'] = user_input
-        print(colored(f'Restoring user input id {user_input.id}: ', 'yellow'), end='')
-        print(colored(f'{user_input.user_input}', 'yellow', attrs=['bold']))
-        return user_input.user_input
+def styled_text(project, question, ignore_user_input_count=False, style=None):
+    if not ignore_user_input_count:
+        project.user_inputs_count += 1
+        user_input = get_saved_user_input(project, question)
+        if user_input is not None and user_input.user_input is not None and project.skip_steps:
+            # if we do, use it
+            project.checkpoints['last_user_input'] = user_input
+            print(yellow_bold(f'Restoring user input id {user_input.id}: '), end='')
+            print(yellow_bold(f'{user_input.user_input}'))
+            return user_input.user_input
 
-    config = {
-        'style': custom_style,
-    }
-    response = questionary.text(question, **config).unsafe_ask()  # .ask() is included here
-    user_input = save_user_input(project, question, response)
+    if project.ipc_client_instance is None or project.ipc_client_instance.client is None:
+        config = {
+            'style': style if style is not None else custom_style,
+        }
+        question = remove_ansi_codes(question) # Colorama and questionary are not compatible and styling doesn't work
+        response = questionary.text(question, **config).unsafe_ask()  # .ask() is included here
+    else:
+        response = print(question, type='user_input_request')
+        print(response)
+
+    if not ignore_user_input_count:
+        user_input = save_user_input(project, question, response)
 
     print('\n\n', end='')
-
     return response
 
 
