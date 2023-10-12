@@ -47,8 +47,11 @@ def filter_sensitive_fields(record):
         record.args = tuple(args_list)
 
     # Remove ANSI escape sequences - colours & bold
-    record.msg = re.sub(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])', '', record.msg)
-    return record.levelno <= logging.INFO
+    # Peewee passes a tuple as record.msg
+    if isinstance(record.msg, str):
+        record.msg = re.sub(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])', '', record.msg)
+
+    return True
 
 
 logger = setup_logger()

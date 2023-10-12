@@ -27,8 +27,8 @@ class TestTechLead:
             user_stories=[]
         )
 
-        self.project.root_path = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                                                              '../../../workspace/TestTechLead'))
+        self.project.set_root_path(os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                                              '../../../workspace/TestTechLead')))
         self.project.technologies = []
         self.project.project_description = '''
 The project entails creating a web-based chat application, tentatively named "chat_app." 
@@ -58,7 +58,7 @@ The development process will include the creation of user stories and tasks, bas
 
         mock_questionary = MockQuestionary(['', '', 'no'])
 
-        with patch('utils.llm_connection.questionary', mock_questionary):
+        with patch('utils.questionary.questionary', mock_questionary):
             # When
             development_plan = self.techLead.create_development_plan()
 

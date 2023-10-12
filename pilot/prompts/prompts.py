@@ -126,7 +126,7 @@ def get_additional_info_from_user(project, messages, role):
         while True:
             if isinstance(message, dict) and 'text' in message:
                 message = message['text']
-            print(yellow(f"Please check this message and say what needs to be changed. If everything is ok just press ENTER",))
+            print(yellow("Please check this message and say what needs to be changed. If everything is ok just press ENTER",))
             answer = ask_user(project, message, require_some_input=False)
             if answer.lower() == '':
                 break
@@ -193,12 +193,16 @@ def generate_messages_from_custom_conversation(role, messages, start_role='user'
       ... ]
     """
     # messages is list of strings
-    result = [get_sys_message(role)]
+    system_message = get_sys_message(role)
+    result = [system_message]
+    logger.info(f'\n>>>>>>>>>> {role} Prompt >>>>>>>>>>\n%s\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>', system_message['content'])
 
     for i, message in enumerate(messages):
         if i % 2 == 0:
             result.append({"role": start_role, "content": message})
+            logger.info(f'\n>>>>>>>>>> {start_role} Prompt >>>>>>>>>>\n%s\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>', message)
         else:
             result.append({"role": "assistant" if start_role == "user" else "user", "content": message})
+            logger.info('\n>>>>>>>>>> Assistant Prompt >>>>>>>>>>\n%s\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>', message)
 
     return result

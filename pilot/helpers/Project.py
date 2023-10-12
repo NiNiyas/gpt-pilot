@@ -1,8 +1,7 @@
 import json
 import os
-import re
 from typing import Tuple
-from utils.style import green_bold, yellow_bold, cyan, white_bold
+from utils.style import  yellow_bold, cyan, white_bold
 from const.common import IGNORE_FOLDERS, STEPS
 from database.database import delete_unconnected_steps_from, delete_all_app_development_data
 from const.ipc import MESSAGE_TYPE
@@ -20,11 +19,12 @@ from database.models.development_steps import DevelopmentSteps
 from database.models.file_snapshot import FileSnapshot
 from database.models.files import File
 from logger.logger import logger
+from utils.dot_gpt_pilot import DotGptPilot
 
 
 class Project:
     def __init__(self, args, name=None, description=None, user_stories=None, user_tasks=None, architecture=None,
-                 development_plan=None, current_step=None, ipc_client_instance=None):
+                 development_plan=None, current_step=None, ipc_client_instance=None, enable_dot_pilot_gpt=True):
         """
         Initialize a project.
 
@@ -70,6 +70,11 @@ class Project:
             self.architecture = architecture
         # if development_plan is not None:
         #     self.development_plan = development_plan
+        self.dot_pilot_gpt = DotGptPilot(log_chat_completions=enable_dot_pilot_gpt)
+
+    def set_root_path(self, root_path: str):
+        self.root_path = root_path
+        self.dot_pilot_gpt.with_root_path(root_path)
 
     def start(self):
         """
@@ -129,6 +134,7 @@ class Project:
                         break
         # TODO END
 
+        self.dot_pilot_gpt.write_project(self)
         print(json.dumps({
             "project_stage": "coding"
         }), type='info')
@@ -197,7 +203,7 @@ class Project:
             try:
                 relative_path, full_path = self.get_full_file_path('', file)
                 file_content = open(full_path, 'r').read()
-            except:
+            except OSError:
                 file_content = ''
 
             files_with_content.append({
@@ -316,7 +322,7 @@ class Project:
                 file=file_in_db,
                 defaults={'content': file.get('content', '')}
             )
-            file_snapshot.content = content = file['content']
+            file_snapshot.content = file['content']
             file_snapshot.save()
 
     def restore_files(self, development_step_id):
@@ -325,7 +331,7 @@ class Project:
 
         clear_directory(self.root_path, IGNORE_FOLDERS)
         for file_snapshot in file_snapshots:
-            update_file(file_snapshot.file.full_path, file_snapshot.content);
+            update_file(file_snapshot.file.full_path, file_snapshot.content)
 
     def delete_all_steps_except_current_branch(self):
         delete_unconnected_steps_from(self.checkpoints['last_development_step'], 'previous_step')
@@ -339,8 +345,7 @@ class Project:
         if description is not None:
             question += '\n' + '-' * 100 + '\n' + white_bold(description) + '\n' + '-' * 100 + '\n'
 
-        if convo is not None:
-            reset_branch_id = convo.save_branch()
+        reset_branch_id = None if convo is None else convo.save_branch()
 
         while answer != 'continue':
             answer = ask_user(self, question,
