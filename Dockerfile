@@ -22,7 +22,7 @@ RUN chmod +x /tmp/s6-overlay-${OVERLAY_ARCH}-installer && \
     /tmp/s6-overlay-${OVERLAY_ARCH}-installer / && \
     rm /tmp/s6-overlay-${OVERLAY_ARCH}-installer
 
-RUN apk add --update --virtual=build-dependencies postgresql-dev wget gcc g++ && \
+RUN apk add --update --virtual=build-dependencies postgresql-dev wget gcc g++ cargo && \
     apk add --update --no-cache bash shadow libpq nodejs npm coreutils curl wget && \
     wget https://github.com/tsl0922/ttyd/releases/download/${TTYD_VERSION}/ttyd.${TTYD_ARCH} -O /usr/bin/ttyd && \
     chmod +x /usr/bin/ttyd && \
