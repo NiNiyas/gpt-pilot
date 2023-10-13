@@ -1,4 +1,7 @@
 # 🧑‍✈️ GPT PILOT
+
+<a href="https://trendshift.io/repositories/466" target="_blank"><img src="https://trendshift.io/api/badge/repositories/466" alt="Pythagora-io%2Fgpt-pilot | Trendshift" style="width: 250px; height: 55px;" width="250" height="55"/></a>
+
 ### GPT Pilot helps developers build apps 20x faster
 
 You specify what kind of app you want to build. Then, GPT Pilot asks clarifying questions, creates the product and technical requirements, sets up the environment, and **starts coding the app step by step, like in real life, while you oversee the development process**. It asks you to review each task it finishes or to help when it gets stuck. This way, GPT Pilot acts as a coder while you are a lead dev who reviews code and helps when needed.
@@ -19,6 +22,7 @@ You specify what kind of app you want to build. Then, GPT Pilot asks clarifying 
 * [🕴How's GPT Pilot different from _Smol developer_ and _GPT engineer_?](#hows-gpt-pilot-different-from-smol-developer-and-gpt-engineer)
 * [🍻 Contributing](#-contributing)
 * [🔗 Connect with us](#-connect-with-us)
+* [🌟 Star history](#-star-history)
 <!-- TOC -->
 
 ---
@@ -249,3 +253,8 @@ Other than the research, GPT Pilot needs to be debugged to work in different sce
 🌟 As an open-source tool, it would mean the world to us if you starred the GPT-pilot repo 🌟
 
 💬 Join [the Discord server](https://discord.gg/HaqXugmxr9) to get in touch.
+
+
+# 🌟 Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=Pythagora-io/gpt-pilot&type=Date)](https://star-history.com/#Pythagora-io/gpt-pilot&Date)
